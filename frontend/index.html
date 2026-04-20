@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Analyzer v2.0 | Advanced Dashboard</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { netflixRed: '#E50914', darkBg: '#141414', darkCard: '#2f2f2f', darkBorder: '#3d3d3d' } } }
+        }
+    </script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-darkBg text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans overflow-x-hidden">
+
+    <aside class="w-full md:w-72 bg-white dark:bg-black border-b md:border-b-0 md:border-r border-gray-200 dark:border-darkBorder p-6 md:p-8 flex flex-col gap-8 flex-shrink-0">
+        <div class="text-netflixRed text-3xl md:text-4xl font-extrabold tracking-widest uppercase text-center md:text-left">Netflix</div>
+        
+        <div class="flex flex-col gap-3">
+            <h3 class="text-lg font-bold border-b border-gray-200 dark:border-darkBorder pb-2 mb-2">Filter Content</h3>
+            <div class="flex flex-col gap-3">
+                <label class="flex items-center gap-3 cursor-pointer"><input type="radio" name="content_type" value="All" checked class="accent-netflixRed w-5 h-5"> All</label>
+                <label class="flex items-center gap-3 cursor-pointer"><input type="radio" name="content_type" value="Movie" class="accent-netflixRed w-5 h-5"> Movie</label>
+                <label class="flex items-center gap-3 cursor-pointer"><input type="radio" name="content_type" value="TV Show" class="accent-netflixRed w-5 h-5"> TV Show</label>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <p class="text-sm text-gray-600 dark:text-gray-400">Max Release Year: <span id="year_val" class="font-bold text-netflixRed ml-1">2021</span></p>
+            <input type="range" min="1950" max="2024" value="2021" id="year_slider" class="w-full accent-netflixRed cursor-pointer">
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-10 overflow-y-auto w-full">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:mb-12">
+            <div>
+                <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight mb-2"><i class="fa-solid fa-film text-netflixRed mr-2"></i> Interactive Netflix Analyzer</h1>
+                <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">Deep-dive into platform trends and metadata.</p>
+            </div>
+            <button id="theme_btn" class="w-full md:w-auto justify-center px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-darkBorder font-bold hover:border-netflixRed dark:hover:border-netflixRed hover:text-netflixRed transition-all duration-300 flex gap-2 items-center"><i class="fa-solid fa-sun"></i> Light Mode</button>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-10 w-full">
+            <div class="bg-white dark:bg-darkCard p-5 md:p-7 rounded-2xl border border-gray-200 dark:border-darkBorder shadow-lg w-full">
+                <h2 class="text-lg md:text-xl font-bold mb-5 flex items-center gap-2"><span class="w-1 h-6 bg-netflixRed rounded"></span>Content Added Over Time</h2>
+                <div id="line_chart" class="w-full h-64 md:h-80"></div>
+            </div>
+            <div class="bg-white dark:bg-darkCard p-5 md:p-7 rounded-2xl border border-gray-200 dark:border-darkBorder shadow-lg w-full">
+                <h2 class="text-lg md:text-xl font-bold mb-5 flex items-center gap-2"><span class="w-1 h-6 bg-netflixRed rounded"></span>Top Countries Producing Content</h2>
+                <div id="bar_chart" class="w-full h-64 md:h-80"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mb-12 w-full">
+            <div class="xl:col-span-2 bg-white dark:bg-darkCard p-5 md:p-7 rounded-2xl border border-gray-200 dark:border-darkBorder shadow-lg w-full">
+                <h2 class="text-lg md:text-xl font-bold mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-netflixRed rounded"></span>Top Genres Distributions</h2>
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-5">Discover the most frequent tags in the filtered data.</p>
+                <div id="genre_tree_chart" class="w-full h-72 md:h-96"></div>
+            </div>
+            <div class="bg-white dark:bg-darkCard p-5 md:p-7 rounded-2xl border border-gray-200 dark:border-darkBorder shadow-lg flex flex-col text-left w-full">
+                <h2 class="text-lg md:text-xl font-bold mb-3"><i class="fa-solid fa-broadcast-tower text-netflixRed mr-2"></i> Live Viewer Spikes</h2>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-6 flex-1">Simulated real-time ingestion of content start events.</p>
+                <button id="start_live_btn" class="bg-netflixRed hover:bg-red-700 text-white font-bold py-3.5 px-6 rounded-lg transition-transform transform hover:scale-105 w-full"><i class="fa-solid fa-play mr-2"></i> Start Live Simulation</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
