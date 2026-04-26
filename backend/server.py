@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import random
 import asyncio
+import os 
 
 app = FastAPI(title="Netflix Content Analyzer API", version="1.1.0")
 
@@ -15,7 +16,11 @@ app.add_middleware(
 
 print("Loading and cleaning dataset...")
 try:
-    df = pd.read_csv("netflix_titles.csv")
+    
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    CSV_PATH = os.path.join(BASE_DIR, "netflix_titles.csv")
+    
+    df = pd.read_csv(CSV_PATH) # <-- Changed to use absolute path
     df['date_added'] = pd.to_datetime(df['date_added'], errors='coerce')
     df['year_added'] = df['date_added'].dt.year
     df = df.dropna(subset=['year_added']) 

@@ -1,15 +1,12 @@
-
 const API_URL = "http://localhost:8000/api";
 const WS_URL = "ws://localhost:8000/ws/live_viewers";
 const netflixRed = '#E50914';
 const netflixBlue = '#0071eb';
 
-
 let currentType = "All";
 let currentYear = 2021;
 let isDarkMode = true;
 let liveSocket = null;
-
 
 const themeBtn = document.getElementById('theme_btn');
 const htmlEl = document.documentElement;
@@ -17,7 +14,6 @@ const yearSlider = document.getElementById('year_slider');
 const yearVal = document.getElementById('year_val');
 const contentRadios = document.getElementsByName('content_type');
 const startLiveBtn = document.getElementById('start_live_btn');
-
 
 function debounce(func, timeout = 300){
   let timer;
@@ -39,7 +35,6 @@ function getBaseLayout() {
     };
 }
 
-
 function getIconForGenre(genre) {
     const style = "font-family: 'Font Awesome 6 Free'; font-weight: 900;";
     const iconMap = {
@@ -49,12 +44,12 @@ function getIconForGenre(genre) {
         "Action & Adventure": "&#xf135;",        
         "Children & Family Movies": "&#xf0c0;",  
         "Independent Movies": "&#xf008;",        
-        "Romantic Movies": "&#xf004;",           
+        "Romantic Movies": "&#xf004;",          
         "Thrillers": "&#xf21b;",                 
         "Comedies": "&#xf588;",                  
         "TV Dramas": "&#xf26c;",                 
         "International TV Shows": "&#xf0ac;",    
-        "TV Comedies": "&#xf26c;",               
+        "TV Comedies": "&#xf26c;",              
     };
     const unicode = iconMap[genre] || "&#xf02b;"; 
     return `<span style="${style}">${unicode}</span>`;
@@ -65,8 +60,17 @@ async function fetchAndRenderDashboard() {
     try {
         const res = await fetch(`${API_URL}/dashboard_stats?content_type=${currentType}&max_year=${currentYear}`);
         const data = await res.json();
+        
+        // <-- Added error handler to prevent silent crash -->
+        if (data.error) {
+            console.error("Backend error:", data.error);
+            return; 
+        }
+
         renderCharts(data.line_chart, data.bar_chart, data.tree_chart);
-    } catch (error) { console.error("Error fetching dashboard data:", error); }
+    } catch (error) { 
+        console.error("Error fetching dashboard data:", error); 
+    }
 }
 
 function renderCharts(lineData, barData, treeData) {
@@ -101,7 +105,6 @@ function renderCharts(lineData, barData, treeData) {
         textinfo: "label",
         tiling: { pad: 5 } 
     };
-    
     
     const treeLayout = { 
         ...getBaseLayout(), 
@@ -154,12 +157,10 @@ yearSlider.addEventListener('input', (e) => {
     processSliderChange(); 
 });
 
-
 window.addEventListener('resize', debounce(() => {
     Plotly.Plots.resize('line_chart');
     Plotly.Plots.resize('bar_chart');
     Plotly.Plots.resize('genre_tree_chart');
 }, 200));
-
 
 fetchAndRenderDashboard();
